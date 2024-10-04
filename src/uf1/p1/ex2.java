@@ -1,3 +1,5 @@
+package uf1.p1;
+
 import java.io.File;
 
 public class ex2 {

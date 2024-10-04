@@ -1,4 +1,4 @@
-package ex1;
+package uf1.p1.ex1;
 
 import java.io.File;
 import java.util.ArrayList;
