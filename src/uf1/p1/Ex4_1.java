@@ -2,10 +2,11 @@ package uf1.p1;
 
 import java.net.URI;
 import java.nio.file.*;
+import java.util.stream.Stream;
 
 public class Ex4_1 {
     public static void main(String[] args) {
-        String path = "/home/46948549y/IdeaProjects/m06-uf1-p1/src/uf1/p1/test/test.txt";
+        String path = "src/uf1/p1/test/test.txt";
 
         // Path amb Path
         Path path1 = Path.of(path);
@@ -36,7 +37,12 @@ public class Ex4_1 {
     }
     private static void checkIfExists(Path path) {
         if (Files.exists(path)) {
-            System.out.println("Existeix l'arxiu " + path.toAbsolutePath());
+                if (path.isAbsolute()) {
+                    System.out.println("És una ruta absoluta.");
+                } else {
+                    System.out.println("És una ruta relativa.");
+                    System.out.println(path.toAbsolutePath());
+                }
         } else System.out.println("No existeix l'arxiu " + path);
     }
 }
