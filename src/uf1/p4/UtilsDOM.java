@@ -36,43 +36,47 @@ public class UtilsDOM {
         return doc;
     }
 
-    public String recorrerDOM(Document doc){
-        String result = "";
+    public String recorrerDOM(Document doc) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setIgnoringComments(true);
+        factory.setIgnoringElementContentWhitespace(true);
 
-        //Obtenir el primer node del DOM
-        Node source = doc.getFirstChild();
-        result += "***" + source.getNodeName() + "***" + "\n";
+        StringBuilder res = new StringBuilder();
 
-        //Obtenir llista dels nodes fills de l'arrel
-        NodeList nodelist = source.getChildNodes();
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            NodeList nodeList = doc.getChildNodes();
 
-        result += recorrerNode(source);
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                res.append(recorrerNode(node));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
-        return result;
+        return res.toString();
     }
 
-    public String recorrerNode(Node node) {
-        String result = "";
-        
-        NodeList nodeList = node.getChildNodes();
+    public static String recorrerNode(Node node) {
+        StringBuilder res = new StringBuilder();
+        res.append("\n").append(node.getNodeName()).append(" ").append(node.getNodeValue()).append("\n");
 
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node child = nodeList.item(i);
-
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                result += child.getNodeName() + "\n";
-                NamedNodeMap attributes = node.getAttributes();
-
-                for (int j = 0; j < attributes.getLength(); j++) {
-                    Node attribute = attributes.item(j);
-                    result += attribute.getNodeValue() + "\n";
-                }
-                result += recorrerNode(child);
-
-            } else if (child.getNodeType() == Node.TEXT_NODE) {
-                result += child.getNodeValue() + "\n";
+        if (node.hasAttributes()) {
+            NamedNodeMap attrMap = node.getAttributes();
+            for (int i = 0; i < attrMap.getLength(); i++) {
+                Node attr = attrMap.item(i);
+                res.append(attr.getNodeName()).append(attr.getNodeValue()).append("\n");
             }
         }
-        return result;
+        if (node.hasChildNodes()) {
+            NodeList childList = node.getChildNodes();
+            for (int i = 0; i < childList.getLength(); i++) {
+                Node child = childList.item(i);
+                res.append(recorrerNode(child));
+            }
+        }
+        return res.toString();
     }
 }
+
