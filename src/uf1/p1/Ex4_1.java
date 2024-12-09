@@ -2,7 +2,6 @@ package uf1.p1;
 
 import java.net.URI;
 import java.nio.file.*;
-import java.util.stream.Stream;
 
 public class Ex4_1 {
     public static void main(String[] args) {
