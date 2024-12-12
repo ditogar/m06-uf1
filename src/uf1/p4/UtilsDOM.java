@@ -8,75 +8,66 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UtilsDOM {
     public Document obrirXMLAmbDOM(File fitxer) {
-        Document doc = null; //Representació de l'arbre DOM
+        Document doc = null; // Representació de l'arbre DOM
 
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-            //Indica que el model DOM no ha de processar comentaris dins l'XML
+            // Indica que el model DOM no ha de processar comentaris dins l'XML
             factory.setIgnoringComments(true);
 
-            //Indica que ha d'ignorar els espais en blanc que tingui el document
+            // Indica que ha d'ignorar els espais en blanc que tingui el document
             factory.setIgnoringElementContentWhitespace(true);
 
-            //Es crea un objecte DocumentBuilder per a carregar en ell
+            // Es crea un objecte DocumentBuilder per a carregar en ell
             // l'estructura d'arbre a partir de l'XML
             DocumentBuilder builder = factory.newDocumentBuilder();
 
-            //Parsejar el documento XML i generar el seu DOM
+            // Parsejar el documento XML i generar el seu DOM
             doc = builder.parse(fitxer);
-            //Ara doc apunta a l'arbdre DOM preparat per a ser recorregut
-
+            // Ara doc apunta a l'arbdre DOM preparat per a ser recorregut
+            doc.getDocumentElement().normalize(); // Normalizar el documento
         } catch (Exception e) {
             e.printStackTrace();
         }
         return doc;
     }
 
-    public String recorrerDOM(Document doc) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setIgnoringComments(true);
-        factory.setIgnoringElementContentWhitespace(true);
+    public void recorrerNode(Node node) {
 
-        StringBuilder res = new StringBuilder();
-
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            NodeList nodeList = doc.getChildNodes();
-
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                res.append(recorrerNode(node));
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            System.out.println(node.getNodeName() + " ");
+            if (node.hasAttributes()) {
+                NamedNodeMap attributes = node.getAttributes();
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    Node a = attributes.item(i);
+                    if (a.getNodeName().equals("publicat_el")) {
+                        System.out.println("Edat " +
+                                (Integer.parseInt(Year.now().toString()) - Integer.parseInt(a.getNodeValue())));
+                    }
+                }
             }
-        } catch (Exception e) {
-            System.out.println(e);
+            NodeList childs = node.getChildNodes();
+            for (int i = 0; i < childs.getLength(); i++) {
+                recorrerNode(childs.item(i));
+            }
         }
 
-        return res.toString();
+        if (node.getNodeType() == Node.TEXT_NODE) {
+            String content = node.getNodeValue().trim();
+            if (!content.isEmpty()) {
+                System.out.println(content);
+            }
+        }
     }
+    public ArrayList<String> getTotsElsTitols(Document doc) {
+        Node node = doc.getDocumentElement();
 
-    public static String recorrerNode(Node node) {
-        StringBuilder res = new StringBuilder();
-        res.append("\n").append(node.getNodeName()).append(" ").append(node.getNodeValue()).append("\n");
-
-        if (node.hasAttributes()) {
-            NamedNodeMap attrMap = node.getAttributes();
-            for (int i = 0; i < attrMap.getLength(); i++) {
-                Node attr = attrMap.item(i);
-                res.append(attr.getNodeName()).append(attr.getNodeValue()).append("\n");
-            }
-        }
-        if (node.hasChildNodes()) {
-            NodeList childList = node.getChildNodes();
-            for (int i = 0; i < childList.getLength(); i++) {
-                Node child = childList.item(i);
-                res.append(recorrerNode(child));
-            }
-        }
-        return res.toString();
     }
 }
-
